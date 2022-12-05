@@ -1,0 +1,208 @@
+---
+title: "Android Rooting and Flashing Guide"
+date: 11-2-2021
+slug: "android-guide"
+featuredImage: ./android-root.png
+---
+
+# Definitive Guide to Pixel 5 Rooting / Custom Roms
+
+```javascript
+console.log('wow')
+```
+
+I've been a pretty active member of the custom-android scene as of late. I've also been seeing alot of users getting into, or sometimes **back*** into custom ROMs, and generally having no clue as lots of things have changed since the olden day of Cyanogenmod, ParanoidAndroid, Dirty Unicorns, etc...if those names make you feel lost, they are just some old, popular ROMs people used a few years ago.
+
+With the release of Android 12, I thought it would be helpful to people to compile a list of common terms, and procedures to achieve different goals on your Android device. 
+
+**TLDR;**
+
+- See [Rooting Steps](#rooting-steps)
+- See [Custom ROMs](#custom-roms)
+- See [Updating While Rooted](#updating-steps)
+
+## Who is this guide for?
+This guide is for anyone who wants to learn more about the Android customization scene. I will admit, it's mostly geared twards Pixel owners, as these devices are very close to stock android. Other devices, like the OnePlus phones, as well as Samsung phones, contain many many tweaks and customizations from the manufacturers, and tend to cause issues when using the methods listed here. This guide can still be useful to you in understanding the broader picture, however.
+
+## Platform tools
+Before you can think of doing anything to your phone, you need to set up your pc to work on it first. To make changes to our Android phones, we need whats called the "Platform Tools". So, I figure before we do anything else, let's make sure that we can connect to the phone though ADB and Fastboot.
+
+### Installing the tools
+
+#### Linux
+The installation method varies between linux distros.
+
+**Debian/Ubuntu/POP OS/ Zorin/ (most) Users**
+```shell
+sudo apt-get install android-sdk-platform-tools-common​
+```
+
+**Fedora / Opensuse Users**
+```shell
+sudo dnf install android-tools
+```
+
+**Arch Linux Users**
+```shell
+pacaur -S android-sdk-platform-tools
+```
+
+If you are having permission issues when trying to detect your device on Linux, you probably need to fix your [uDev Rules](https://github.com/M0Rf30/android-udev-rules)
+
+#### Windows
+1. Download the [latest version of the android SDK platform tools](https://dl.google.com/android/repository/platform-tools-latest-windows.zip)
+2. Extract the zip folder somewhere easy to get too (e.x. C:\platform-tools)
+3. open your windows start menu and type "env" and select the change env variables options
+4. find the entry called PATH, and double click it. A new window will open with multiple entries
+5. click add new entry on the right hand side and enter the folder path where you extracted the files (e.x. C:\platform-tools)
+6. open a terminal window (i reccomend Windows terminal over cmd prompt) and type adb to make sure the command is recognized
+
+Adding the tools to your path variable makes it much easier to use, as this allows you to call adb or fastboot from any directory.
+
+## Terminology
+
+### Rooting
+Rooting is referring to having complete access to your phone. Normally, certian portions of the system are kept inaccessible to average users because there is the potential to break or even brick your system if these files are messed with. Being rooted means that some apps, or "modules" as Magisk refers to them, can now edit these system files to change how your operating system works on a lower level than your average app can. Take the Tasker app, for example. Without root, what you can do with the app is limited. Such is the case with other apps, such as the popular third-party launcher, Nova Launcher. Having root permissions means the app can do extra things, such as hiding the system clock at the top of the screen when on the launcher home.
+
+### Magisk
+Magisk is the currently accepted rooting method for Android. Back in the day we used an app called SuperSU, but it's not really supported anymore.
+
+Currently, Magisk is in a strange state. It's undergoing lots of changes, due to it's maintainer, TopJonWu, being hired at Google as a security specialist. The project is in some sense a conflict of interest for him and his job, and is undergoing changes. With the latest version of Magisk Canary (the bleeding edge build of Magisk) the ability to hide magisk from system apps (such as google play services or banking apps) has been removed, and the underlying system providing a framework to make modules is changing to a new one called Zygisk. Already, modules are being updated to use Zygisk, and a new form of Magisk Hide is out called deny-list. We still have the same functionality that we've always had, just in a slightly different way. Don't panic people...
+
+### Bootloader
+Your hard drive (or more accuratley, SSD) in your phone consists of multiple partitions, or parts...just the same as your desktop PC. These partitions all come together to make the entire system. One of these partitions is called the bootlaoder, and it has the very important job of finding the starting point of your system and booting into it, so that the graphical enviorment can start up. Often times, phones are shipped with locked bootloaders and therefore cannot be modified. However, certian phones some with unlockable bootloaders. Pixel devices for the most part are all bootloader-unlocked, meaning we can toggle a setting that will allow us to unlock the bootloader, allowing us to potentially boot into a different system than came with the phone. Unlocking the bootloader is fairly simple, but in most cases will wipe all data on the phone. Sorry folks. 
+
+### Safteynet
+Safteynet is the big G's way to ensure device compatibility and security. It's job is basically to allow apps to check the integrity of the system's security to protect sensitive apps on your device such as banking apps and the tap-to-pay service. We are able to pass safteynet in most cases using the Magisk-Hide module located in the Magisk app in combination with a Safteynet fix module by the awesome platform dev Kdrag0n. Be sure to go support him on Patreon (you'll also recieve early access to new module and ROM releases).
+
+### Custom ROM
+A custom ROM is entirely different base system than your phone came with. Often times these custom ROMs have performance increases, custom settings/features, UI tweaks for a more beautiful system, custom default apps, and much, much more. These operating systems are generally pulled from a more general base operating system, 99% of the time pulled from either AOSP itself, or Lineage OS base. Using these custom ROMs are usually a give-and-take scenario. You will (most likley) no longer recieve OTA Updates and security patches. You will have to go through special procedures to update your device. Sometimes ROMs cannot support safteynet, and you can no longer use your tap and pay methods or banking apps, and even some play store games will detect you running a custom OS and refuse to let you play for fear of having a hack client. These are things that you must weigh out for yourself and decide if flashing a cusrom ROM is for **YOU**.
+
+### ADB & Fastboot
+ADB & Fastboot are the tunnels to our phones internal software. Using ADB & Fastboot we can flash img files to certian partitions (disk sectors) on the operating system, or flash multiple images and replace the operating system as a whole (i.e. flash a custom ROM) without ADB and Fastboot, you will not be able to root or flash a custom ROM. Let's dive a little into what each of these things are:
+
+#### ADB
+ADB stands for Android Debug Bridge. It allows us to do a plethora of things, including (but not limited to) installing and uninstalling apps, accesing hidden developer features, sending and pushing files, rebooting into recovery, fastboot, or the bootloader, and many many more things. In order to use ADB, you must first enable the developer tools in your settings.
+
+#### Fastboot
+Fastboot is a diagnostic tool which allows you to modify the file system of your Android device via your computer. It allows us to install custom firmware, recoveries, or modify existing ones. Fastboot will also allow us to boot into some .img files from the bootloader (such as a tempoary custom recovery)
+
+### VBmeta.img and Veritity
+The VBmeta.img file in your ROM is a cryptographically signed file that contains verification data for verifying the systems boot.img, system.img, and other things in the operating system. In short, to modify your bootloader or flash a custom kernel, this needs to be disabled. Disabling vbmeta is as follows:
+
+#### VBMeta Steps
+1. Extract down into the ROM you are using's zip file, and locate the vbmeta.img file.
+2. Open a terminal / powershell window into the same directory as the vbmeta.img
+3. Run ```adb reboot bootloader```
+4. Once it's in bootloader mode, run  ```sh fastboot --disable-verity --disable-verification flash vbmeta vbmeta.img``
+5. That's it! All done. You're now free to flash your Magisk patched boot.img, or a custom kernel. Whatever you'd like!
+
+Keep in mind, however, you'll need to re-do this step each time you update / re-flash your device! Also, not having this option enabled IS a potential security risk. I guess...if you work at the NSA or something. Specifically, your phone can no longer detect if your bootloader and a couple other things are verified (ie. has someone/something changed them) and COULD lead to code being executed on your device that you are un-aware of. Just a fair warning...the likeleyhood of this ever happening is very small.
+
+## Unlocking the bootloader
+
+### The steps
+1. Ensure you've installed and checked your ADB & Fastboot are working correctly and detecting your device.
+2. Enter your developer settings (or go to settings and type bootloader for the same result)
+3. Tick the checkbox to enable OEM unlocking
+4. Plug your device into your computer
+5. open a terminal and enter ```sh adb reboot bootloader```
+6. When the phone boots into the bootloader, enter ```sh fastboot flashing unlock```
+7. Confirm on the phone using the indicated volume key that you would indeed, like to unlock the bootloader
+8. That's it! Your phone will in all likleyhood reboot and now display a warning that the phone is unlocked during boot. The message will stay for about 5 seconds and then boot as Normally
+
+Congratulations! You now have an unlocked bootloader! 🥳
+
+## Rooting Steps
+Small steps first! Let's talk about how to root the stock ROM on the pixel 5. The steps are the same for any other pixel device as far as I know, but I cannot attest to that as the only other Pixel I'v ever owned was a bootloader-locked 3XL. 
+
+### Rooting FAQ
+
+#### What will rooting do to my phone?
+Upon first rooting your phone, it will operate exactly the same as it does without root. Often times, root is an unneccessary feature that many people don't need. Only root if you have a theme/mod/app that requires root permission, otherwise you will go through all the steps for basically no reason. Sometimes, people need root on thier device in order to flash Magisk modules that allow for passing safteynet as well, so keep that in mind. But I can't recomend anyone root "just to be rooted".
+
+#### What about updates?
+Updates become somewhat of a hassle after rooting. Any OTA update that you take will write over the boot partition where the Magisk patch lives. So what do we do? In order to update, it's reccomended to update using fastboot as opposed to updating through the system update section. The whole goal when updating is to re-patch the boot.img and flash it before the first boot after an update, so none of your modules will break and you will still retain root before and after the update. So, like I said...a little more headache, but not too awful bad. I will detail the steps for updating below.
+
+### The steps
+1. Download the .zip file for your particular rom (for stock Google images, look here)
+2. Extract the files somewhere simple (i.e. Downloads folder)
+3. Open the extracted file, and you will see a couple of .img files, and another .zip file inside
+4. Extract the nested .zip file into the containing folder as well
+5. Inside this file you will find what we need, the boot.img and the vbmeta.img
+6. I like to place the two files we need into a different folder, for simplicity. Create a new folder called "patching" and copy/paste the two files in it
+7. Download the latest Magisk release from it's GitHub, and install it on your phone
+8. Take the boot.img file from your "patching" folder and place it into your phones Downloads folder
+9. Open the app, and click the install button
+10. Tap "select and patch file" and select the boot.img file you put on your phone in step 8
+11. Un-plug and re-plug your phone (otherwise the files won't update)
+12. copy the new magisk-patched file to your "patching" folder.
+13. Ensure you've followed the section about installing the [platform-tools](#platform-tools), and then plug your phone to your PC
+14. Make sure ADB is detecting your device by running ```sh adb devices```. You should see your device listed.
+15. enter ```sh adb reboot bootloader```
+16. Your phone will reboot to a rather scary-looking screen with a warning shown
+17. Enter ```sh fastboot --disable-verity --disable-verification flash vbmeta vbmeta.img``` in the terminal from the same directory as where you palced the vbmeta.img (in the patching folder if you're following everything)
+18. Enter ```sh fastboot flash boot mag``` and press the tab key, and it should auto-complete the rest of the file name
+19. Press enter on your keyboard and you should recieve a confirmation that the file was flashed correctly after a couple of minutes
+20. Reboot your phone back into the system, and go check the magisk app. You should see in the status section that we are indeed rooted now!!! 🥳🥳🥳 
+
+
+
+## Custom ROMs
+
+Custom ROMs bring a plethora of different things to our phones. Some have custom software pre-installed (see Calyx OS custom Firewall app, or Lineage stock apps) and some ROMs have custom tweaks under the hood (see ProtonAOSPs performace fixes) and some offer heavy customization options (see crDroid). However, the steps for installing each are generally the same. I'm going to teach you the big-boy way of flashing ROMs, using your terminal/powershell. Don't be detered! It's very simple, I promise.
+
+### Quick Run Down
+So, what we're gonna do here is as follows:
+1. Flash all data on the device
+2. Use the .zip files flash-all script to install the system
+3. flash addons / custom kernel (if need be, this is entirely optional)
+4. reboot into our new system
+
+see? I told you, it really is as simple as that. We will also cover how to properly update your system and maintain root status without your Magisk modules breaking during the update. Let's move forward! 
+
+### Flashing Steps
+1. Download your preferred ROMs .zip file
+2. Extract the folder (or use the same folder you extracted for patching the boot.img file)
+3. Navigate into the extracted folder and locate the flash-all.sh (or flash-all.bat for Windows)
+4. reboot your phone into bootloader mode using ```adb reboot bootloader```
+5. Once the phone has re-booted, run ```fastboot -w``` to **wipe** the phone's data
+6. Run ```./flash-all.sh``` **do not touch the phone during this process**
+7. Once the flash is done, the phone will return to bootloader mode. Now is the time to flash any addons or modifications (i.e. Google Apps, patched boot.img, or custom kernel). So, flash any additional files you need now. For example, if you want to root the ROM, flash the VBmeta.img file and flash the patched boot.img.
+
+See [VB Meta](#vbmetaimg-and-veritity) for info about disabling Veritity
+
+See [Rooting Steps](#rooting-steps) for info about patching boo.img and flashing Magisk
+
+## Updating While Rooted
+
+So, you're enjoying your new, customized system...and then, an update is released. How in the world do you go about updating this thing?? 🤔 No worries, it isn't too complicated! Let's run over the general idea of what we're doing, and then we'll cover each update step, one by one.
+
+### The Rundown;
+
+1. We pre-patch the new boot.img using our current system/Magisk install
+2. Place the patched boot.img somewhere on our PC (I reccomend making a "patching" folder inside your extracted ROM folder)
+3. Flash the new ROM using the flash-all.sh
+4. Flash the pre-patched boot.img file (to install Magisk)
+5. Re-flash any addons we need for the OS (such as Google Apps or a custom kernel)
+6. Reboot into the system, and you're done!
+
+See? Really simple. A bit of a headache as compared to just clicking update from the settings app, but it's the price we pay for custom software! Anyways, let's get on to the actual steps now:
+
+### Updating Steps
+
+1. Download your new ROM version from it's website
+2. Extract the ROM somewhere easy to access (like your downloads or desktop)
+3. Extract the zip file inside the ROM, enter that folder, and copy both the boot.img as well as the vbmeta.img
+4. Create a new folder in your ROM folder called "patching" and paste the two .img files into it
+5. Follow the [rooting steps](#rooting-steps) to patch the boot.img with Magisk
+6. Move the patched boot.img file to your pc's "patching" folder we created in step 4
+7. Navigate to your extracted ROM folder using your terminals ```cd``` command
+8. Test adb by running ```adb devices``` to ensure it's detecting it correctly
+9. Start the update by running `./flash-all.sh` and wait until the terminal reports completed
+10. (optional) if you'd like to maintain root, keep following these steps
+11. Disable veritity per the instructions [here](#vbmeta-steps) and procced
+12. Once the device has rebooted back into bootloader mode (with the warning sign) flash the patched Magisk file uisng ```fastboot flash boot magisk-patched``` and press the tab key to auto-complete the long file name, and press enter
+13. Once again, flash any Google apps or custom kernel that you'd like, per the package instructions
+
+And now you're all done and updated! Congrats!
