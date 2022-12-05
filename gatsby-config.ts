@@ -26,14 +26,19 @@ const config: GatsbyConfig = {
       
       resolve: `gatsby-plugin-mdx`,
       options: {
-        gatsbyRemarkPlugins: [
-          {
-            resolve: `gatsby-remark-images`,
-            options: {
-              maxWidth: 500,
+        mdxOptions: {
+          remarkPlugins: [
+            {
+              resolve: `gatsby-remark-images`,
+              options: {
+                maxWidth: 500,
+              },
             },
-          },
-        ],
+            {
+              resolve: `gatsby-remark-highlight-code`,
+            },
+          ],
+        }
       }
     },
     {

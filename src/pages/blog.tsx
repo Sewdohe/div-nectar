@@ -56,7 +56,7 @@ const BlogPage = ({ data }: PageProps<Queries.BlogPostsQuery>) => {
               >
                 <Row>
                   <Col>
-                    <Text color="#000" size={8}>
+                    <Text color="#fff" size={9}>
                       {post.node.excerpt}
                     </Text>
                   </Col>

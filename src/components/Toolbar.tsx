@@ -23,8 +23,6 @@ export function Toolbar() {
         <Navbar.Content hideIn="xs">
           {links.map(l => <Navbar.Link key={l.name} href={l.url}>{l.name}</Navbar.Link>)}
         </Navbar.Content>
-        {/* <Navbar.Content>
-        </Navbar.Content> */}
       </Navbar>
   )
 }

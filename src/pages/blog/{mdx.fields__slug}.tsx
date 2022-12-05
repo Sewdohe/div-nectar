@@ -9,10 +9,11 @@ import {
 import styled from "styled-components";
 import PostLayout from "../../components/layouts/PostLayout";
 
-const PostTemplate = (
-  { mdx }: Queries.BlogPostQuery,
-  children: JSX.Element[]
-) => {
+interface BPostQueryPusChildren extends Queries.BlogPostQuery {
+  children: ReactNode[]
+}
+
+const PostTemplate = ({mdx, children}: BPostQueryPusChildren,) => {
   const frontmatter = mdx?.frontmatter;
   const toc = mdx?.tableOfContents;
 
@@ -45,8 +46,8 @@ const PostTemplate = (
         {children}
       </div>
     </PostLayout>
-  );
-};
+  )
+}
 
 export const query = graphql`
   query BlogPost($slug: String) {

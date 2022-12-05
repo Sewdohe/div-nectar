@@ -35,7 +35,7 @@ export const components  = {
       </Highlight>
     );
   },
-  h1: ({children}: Props) => <Text  h1>{children}</Text>,
+  h1: ({children}: Props) => <Text color="pink" h1>{children}</Text>,
   h2: ({children}: Props) => <Text h2>{children}</Text>,
   h3: ({children}: Props) => <Text h3>{children}</Text>,
   h4: ({children}: Props) => <Text h4>{children}</Text>,
