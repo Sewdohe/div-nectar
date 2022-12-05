@@ -42,9 +42,7 @@ const PostTemplate = ({mdx, children}: BPostQueryPusChildren,) => {
           image={featuredImage}
         />
       </div>
-      <div>
         {children}
-      </div>
     </PostLayout>
   )
 }

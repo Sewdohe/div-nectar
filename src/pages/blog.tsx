@@ -3,6 +3,7 @@ import React from "react";
 import { Card, Col, Text, Row, Button, Grid } from "@nextui-org/react";
 import styled from "styled-components";
 import { GatsbyImage, getImage } from "gatsby-plugin-image";
+import PostLayout from "../components/layouts/PostLayout";
 
 const PostsContainer = styled.div`
   display: flex;
