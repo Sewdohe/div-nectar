@@ -9,7 +9,7 @@ export const wrapRootElement = ({ element }) => {
   return (
   <NextUIProvider theme={darkTheme}>
     <Toolbar />
-    <MDXProvider components={components}>{element}</MDXProvider>;
+    <MDXProvider components={components}>{element}</MDXProvider>
   </NextUIProvider>
   )
 };

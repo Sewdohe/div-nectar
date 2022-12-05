@@ -3,7 +3,6 @@ import React from "react";
 import { Card, Col, Text, Row, Button, Grid } from "@nextui-org/react";
 import styled from "styled-components";
 import { GatsbyImage, getImage } from "gatsby-plugin-image";
-import PostLayout from "../components/layouts/PostLayout";
 
 const PostsContainer = styled.div`
   display: flex;
@@ -14,7 +13,7 @@ const PostsContainer = styled.div`
 const BlogPage = ({ data }: PageProps<Queries.BlogPostsQuery>) => {
   console.log(data);
   return (
-    <Grid.Container justify="center" css={{maxWidth: '90%', margin: '1rem auto'}}  >
+    <Grid.Container css={{maxWidth: '90%', margin: '1rem auto'}}  >
       {data.allMdx.edges.map((post) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -29,11 +28,11 @@ const BlogPage = ({ data }: PageProps<Queries.BlogPostsQuery>) => {
         `;
 
         return (
-          <Grid justify="center" xs={10} sm={5}>
-            <Card css={{ maxWidth: "300px", margin: '1rem 0' }} key={post.node.id}>
+          <Grid xs={12} sm={5}>
+            <Card css={{ maxWidth: "300px" }} key={post.node.id}>
               <Card.Header css={{ position: "absolute", zIndex: 1, top: 5, textAlign: 'center' }}>
                 <Col>
-                  <Text h3 color="secondary">
+                  <Text h3 color="primary">
                     {post.node.frontmatter?.title}
                   </Text>
                 </Col>

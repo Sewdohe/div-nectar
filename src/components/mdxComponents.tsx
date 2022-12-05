@@ -41,8 +41,6 @@ export const components = {
                 <Text transform="uppercase" color="secondary">
                   {language}
                 </Text>
-                <div style={{flexGrow: 1}}></div>
-                <div>button button buttp</div>
               </Row>
             </Card.Header>
             <Card.Body>
