@@ -1,7 +1,59 @@
 ---
-title: "Joys of Using Linux"
+title: "Xbox 360/One Controller on Linux"
 date: 11-2-2022
-slug: "linux-joy"
-featuredImage: ./android-root.png
-categories: Rant, Linux
+slug: "xbox-controller-arch-linux"
+featuredImage: ./xbox-linux.png
+category: Configuration
 ---
+
+## Xbox one Bluetooth on Linux
+This one was a real head scratcher. Controller would just blink constantly before being configured correctly. You must have the [https:https://aur.archlinux.org/packages/xpadneo-dkms](XpadneoDKMS) driver installed for the system to treat the controller correctly. Even then, some further configuration is required to finish setting up the bluetooth manager to fix pairing and latency issues that I experienced by default.
+*** Installing
+**** Prereqs:
+```shell
+# ARCH
+sudo pacman -S dkms linux-headers bluez bluez-utils
+# DEBIAN
+sudo apt-get install dkms linux-headers-`uname -r`
+# FEDORA
+sudo dnf install dkms make bluez bluez-tools kernel-devel-`uname -r` kernel-headers-`uname -r`
+# RASPBIAN
+sudo apt-get install dkms raspberrypi-kernel-headers
+```
+
+## Installing XpadNeo
+Installation
+
+- Download the Repository to your local machine git clone https://github.com/atar-axis/xpadneo.git
+- cd xpadneo
+- If using DKMS, run sudo ./install.sh
+- If not using DKMS, follow steps above (generic distribution)
+    Done!
+
+**** Connecting the controller via the terminal:
+```shells
+    sudo bluetoothctl
+    [bluetooth]# scan on
+    wait until all available devices are listed (otherwise it may be hard to identify which one is the gamepad)
+    push the connect button on upper side of the gamepad, and hold it down until the light starts flashing fast
+    wait for the gamepad to show up in bluetoothctl, remember the address (e.g. `C8:3F:26:XX:XX:XX`)
+    [bluetooth]# scan off to stop scanning as it may interfere with properly pairing the controller
+    [bluetooth]# pair <MAC>
+    [bluetooth]# trust <MAC>
+    [bluetooth]# connect <MAC> (should usually not be needed but there are open bugs)
+    The <MAC> parameter is optional if the command line already shows the controller name
+```
+
+## Config Files
+Edit the file `/etc/bluetooth/main.conf` with:
+
+```shell
+[LE]
+MinConnectionInterval=7
+MaxConnectionInterval=9
+ConnectionLatency=0
+
+[General]
+ControllerMode = dual
+JustWorksRepairing = confirm
+```

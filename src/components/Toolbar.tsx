@@ -1,5 +1,5 @@
 import React from "react";
-import { Navbar, Text, Link as NLink } from "@nextui-org/react";
+import { Navbar, Text, Link as NextUILink } from "@nextui-org/react";
 import { Link } from "gatsby-link";
 
 const links = [
@@ -29,18 +29,19 @@ export function Toolbar() {
           </Navbar.Link>
         ))}
       </Navbar.Content>
-      <Navbar.Collapse showIn={"xs"}>
+      <Navbar.Collapse>
         {links.map((item) => (
           <Navbar.CollapseItem key={item.name}>
-            <NLink
+            <NextUILink
               color="inherit"
               style={{
                 minWidth: "100%",
               }}
               as={Link}
-              href="#" to={item.url}            >
+              to={item.url}
+              >
               {item.name}
-            </NLink>
+            </NextUILink>
           </Navbar.CollapseItem>
         ))}
       </Navbar.Collapse>

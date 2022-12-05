@@ -28,14 +28,12 @@ const config: GatsbyConfig = {
       options: {
         mdxOptions: {
           remarkPlugins: [
+            require(`remark-gfm`),  
             {
               resolve: `gatsby-remark-images`,
               options: {
                 maxWidth: 500,
               },
-            },
-            {
-              resolve: `gatsby-remark-highlight-code`,
             },
           ],
         }

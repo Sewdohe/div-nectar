@@ -3,6 +3,7 @@ import dracula from "prism-react-renderer/themes/dracula";
 import synthwave from "prism-react-renderer/themes/synthwave84";
 import React from "react";
 import { Card, Col, Row, Text } from "@nextui-org/react";
+import { useTheme } from "@nextui-org/react";
 
 interface Props {
   children: JSX.Element[];
@@ -28,7 +29,7 @@ export const components = {
         language={language}
       >
         {({ className, style, tokens, getLineProps, getTokenProps }) => (
-          <Card style={style} css={{ maxWidth: '80%', margin: '2rem auto' }}>
+          <Card style={style} css={{ maxWidth: "80%", margin: "2rem auto" }}>
             <Card.Header
               css={{
                 position: "absolute",
@@ -59,11 +60,14 @@ export const components = {
       </Highlight>
     );
   },
-  h1: ({ children }: Props) => (
-    <Text color="pink" h1>
-      {children}
-    </Text>
-  ),
+  h1: ({ children }: Props) => {
+    const theme = useTheme()
+    return (
+      <Text color={theme.theme?.colors.pink500.value} h1>
+        {children}
+      </Text>
+    );
+  },
   h2: ({ children }: Props) => <Text h2>{children}</Text>,
   h3: ({ children }: Props) => <Text h3>{children}</Text>,
   h4: ({ children }: Props) => <Text h4>{children}</Text>,

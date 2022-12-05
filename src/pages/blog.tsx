@@ -1,6 +1,6 @@
 import { graphql, PageProps, Link, navigate } from "gatsby";
 import React from "react";
-import { Card, Col, Text, Row, Button, Grid } from "@nextui-org/react";
+import { Card, Col, Text, Row, Button, Grid, Badge } from "@nextui-org/react";
 import styled from "styled-components";
 import { GatsbyImage, getImage } from "gatsby-plugin-image";
 import PostLayout from "../components/layouts/PostLayout";
@@ -36,6 +36,9 @@ const BlogPage = ({ data }: PageProps<Queries.BlogPostsQuery>) => {
                   <Text h3 color="secondary">
                     {post.node.frontmatter?.title}
                   </Text>
+                  <Row justify="center">
+                    <Badge>{post.node.frontmatter?.category}</Badge>
+                  </Row>
                 </Col>
               </Card.Header>
 
@@ -50,7 +53,7 @@ const BlogPage = ({ data }: PageProps<Queries.BlogPostsQuery>) => {
                   bgBlur: "#ffffff66",
                   background: "#ffffff00",
                   borderTop:
-                    "$borderWeights$light solid rgba(255, 255, 255, 0.2)",
+                    "$borderWeights$light solid rgba(255, 255, 255, 0.8)",
                   bottom: 0,
                   zIndex: 1,
                 }}
@@ -93,6 +96,7 @@ export const query = graphql`
           frontmatter {
             slug
             title
+            category
             date
             featuredImage {
               childImageSharp {

@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "develop": "gatsby develop",
+    "develop-network": "gatsby develop -H 0.0.0.0 -p 8000",
     "start": "gatsby develop",
     "build": "gatsby build",
     "serve": "gatsby serve",
@@ -33,6 +34,7 @@
     "gatsby-plugin-sitemap": "^6.2.0",
     "gatsby-plugin-slug": "^2.0.0",
     "gatsby-plugin-styled-components": "^6.2.0",
+    "gatsby-remark-heading-slug": "^0.2.0",
     "gatsby-remark-highlight-code": "^3.2.0",
     "gatsby-remark-images": "^7.2.0",
     "gatsby-remark-prismjs": "^7.2.0",
